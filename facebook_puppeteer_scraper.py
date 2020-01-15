@@ -57,7 +57,7 @@ def facebook_scrape():
             print(event['place']['location'])
 
     # get all cover images
-    event_covers = graph.get_connections("me", "events/covers")
+    event_covers = graph.get_connections("me", "events{covers}")
 
     print(event_covers)
 
