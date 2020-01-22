@@ -1,4 +1,4 @@
-FACEBOOK_USER_ACCESS_TOKEN = "EAAFB1Et4EnkBAJmH7gYpBXLdjtl5kGcuvZAZBebSSH91TFt2oRyrUBRHeYXyAR7mh3qppZBicZAoo6ImzbWaohhOQW9Ogf3hUhnR2ll6hAYk4kjtqCZBK0DPLLmAB7o3rilOguJMrai0HAxJi22xx2GJk63NJwoVXIWCiAtVDlnuLfsJHOMPrL6GtvHng3SzdmpEq6ALHfjzTQDNv3C3MZBBMTUwM0W7tviIkH5vZA37QZDZD"
+FACEBOOK_USER_ACCESS_TOKEN = "EAAFB1Et4EnkBAFm4Ftm1oaFZCMalNQITGHzCeBT7nMh08qfvNuxLZB5cGuRJrDBqnjwX0ndZAHwB2D2MlCx653SfHfuc4wKRgXabamtBfjtpwxZBAeKho9KpVprFE6F4VftnrdMDa5Qm4aPoKqoJJ7ZBCkScWCpGEiN6JpvZCtigZDZD"
 
 import requests
 
@@ -7,27 +7,27 @@ import requests
 
 def get_interested_events():
 
-    # curr_url = 'https://graph.facebook.com/v5.0/me/events?fields=category,cover,description,start_time,is_canceled,name,owner,updated_time,id,place,maybe_count,noreply_count,interested_count,attending_count,end_time,event_times'
-    curr_url = 'https://graph.facebook.com/v5.0/me/events'
-
+    curr_url = 'https://graph.facebook.com/v5.0/me/events?fields=category,cover,description,start_time,is_canceled,name,owner,updated_time,id,place,maybe_count,noreply_count,interested_count,attending_count,end_time,event_times'
+    after = ""
 
     total = 0
     page_num = 0
     events = []
 
-    while (curr_url):
+    while (True):
 
         search_args = {
-            # 'fields': "category,cover,description,start_time,is_canceled,name,owner,updated_time,id,place,maybe_count,noreply_count,interested_count,attending_count,end_time,event_times",
-            # 'fields': "category,cover,description,start_time,name,updated_time,id,place,end_time,event_times",
-            'fields': "id,name,cover,description,start_time,end_time,place,event_times",
+            # 'fields': "events{category,cover,description,start_time,is_canceled,name,owner,updated_time,id,place,maybe_count,noreply_count,interested_count,attending_count,end_time,event_times}",
+            # 'fields': "events",
+            # 'fields': "events{category,cover,description,start_time,is_canceled,name,owner,updated_time,id,place,maybe_count,noreply_count,interested_count,attending_count,end_time,event_times}",
             'access_token': FACEBOOK_USER_ACCESS_TOKEN,
             'limit': 100,
-            
         }
 
-        
+        if (page_num > 0):
+            search_args['after'] = after
 
+        # print(search_args)
 
         resp = requests.Session().get(curr_url, params=search_args)
 
@@ -35,31 +35,47 @@ def get_interested_events():
 
 
         # try:
-        print (curr_url)
+        # print (curr_url)
+        # print(page_num)
+        # print(data)
 
         # if page_num == 0:
-        #     events += data['events']['data']
-
-        #     total += len(data['events']['data'])
-        #     curr_url = data['events']['paging']['next']
-
-        #     print(page_num)
-        #     print(data['events']['data'])
-
-        # elif page_num >= 1:
-        events += data['data']
-
-        total += len(data['data'])
-        if 'next' in data['paging']:
-            curr_url = data['paging']['next']
-        else:
-            break
-
+            
         print(page_num)
+        
         print(data)
 
+        if data['data'] != []:
+            events += data['data']
+
+            total += len(data['data'])
+            # print(data['paging'])
+            
+            after = data['paging']['cursors']['after']
+            
+            print("len events")
+            print(len(events))
+            page_num += 1
+        else:
+            # that's all the events
+            break
+
         # print(page_num)
-        page_num += 1
+        # print(data)
+            # print(data['events']['data'])
+
+        # elif page_num >= 1:
+            # print(data)
+            # events += data['data']
+
+            # total += len(data['data'])
+            # after = data['paging']['cursors']['after']
+
+            # print(page_num)
+            # print(data['data'])
+
+        # print(page_num)
+        
         # except KeyError:
         #     break
 
@@ -77,7 +93,7 @@ def get_interested_events():
     # print(data['events']['data'])
     # print(len(data['events']['data']))
     # print(events)
-
+    
     return events
 
 # Process for frontend to use it 
